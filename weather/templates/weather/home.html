@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<body>
+    <h1>{{ title }}</h1>
+
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Узнать погоду</button>
+        </form>
+    </div>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if weather_data %}
+        {% with day=weather_data.days.0 %}
+        <div class="weather-summary">
+            <h2>Город: {{ weather_data.resolvedAddress }}</h2>
+            <p><strong>{{ weather_data.description }}</strong></p>
+            <p><strong>Температура:</strong> {{ day.temp }}°C (от {{ day.tempmin }}°C до {{ day.tempmax }}°C)</p>
+            <p><strong>Ощущается как:</strong> {{ day.feelslike }}°C</p>
+            <p><strong>Влажность:</strong> {{ day.humidity }}%</p>
+            <p><strong>Условия:</strong> {{ day.conditions }}</p>
+            <p><strong>Ветер:</strong> {{ day.windspeed }} км/ч, порывы до {{ day.windgust }} км/ч</p>
+            <p><strong>Восход:</strong> {{ day.sunrise }} | <strong>Закат:</strong> {{ day.sunset }}</p>
+        </div>
+
+        <h3>Почасовая погода</h3>
+        <table class="hourly-table">
+            <thead>
+                <tr>
+                    <th>Время</th>
+                    <th>Температура (°C)</th>
+                    <th>Ощущается как (°C)</th>
+                    <th>Влажность (%)</th>
+                    <th>Осадки (мм)</th>
+                    <th>Облачность (%)</th>
+                    <th>УФ индекс</th>
+                    <th>Условия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hour in day.hours %}
+                    <tr>
+                        <td>{{ hour.datetime }}</td>
+                        <td>{{ hour.temp }}</td>
+                        <td>{{ hour.feelslike }}</td>
+                        <td>{{ hour.humidity }}</td>
+                        <td>{{ hour.precip }}</td>
+                        <td>{{ hour.cloudcover }}</td>
+                        <td>{{ hour.uvindex }}</td>
+                        <td>{{ hour.conditions }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endwith %}
+    {% endif %}
+{% endblock %}

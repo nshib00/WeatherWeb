@@ -1,63 +1,62 @@
 {% extends 'base.html' %}
+{% load weather_filters %}
 
 {% block content %}
-<body>
-    <h1>{{ title }}</h1>
+<body class="bg-[#252525] min-h-screen py-10 px-4">
+    <h1 class="text-3xl font-bold text-center text-white mb-8">{{ title }}</h1>
 
-    <div class="form-container">
-        <form method="post">
+    <div class="max-w-4xl mx-auto bg-gray-800 rounded-xl shadow-lg p-4 mb-10">
+        <form method="post" class="flex gap-4 items-center">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Узнать погоду</button>
+            <div class="flex-grow">
+                {{ form.city.as_widget }}
+            </div>
+            <button type="submit"
+            class="whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition">
+                Узнать погоду
+            </button>
         </form>
     </div>
 
     {% if error %}
-        <p class="error">{{ error }}</p>
+        <p class="text-red-400 text-center font-medium">{{ error }}</p>
     {% endif %}
 
     {% if weather_data %}
-        {% with day=weather_data.days.0 %}
-        <div class="weather-summary">
-            <h2>Город: {{ weather_data.resolvedAddress }}</h2>
-            <p><strong>{{ weather_data.description }}</strong></p>
-            <p><strong>Температура:</strong> {{ day.temp }}°C (от {{ day.tempmin }}°C до {{ day.tempmax }}°C)</p>
-            <p><strong>Ощущается как:</strong> {{ day.feelslike }}°C</p>
-            <p><strong>Влажность:</strong> {{ day.humidity }}%</p>
-            <p><strong>Условия:</strong> {{ day.conditions }}</p>
-            <p><strong>Ветер:</strong> {{ day.windspeed }} км/ч, порывы до {{ day.windgust }} км/ч</p>
-            <p><strong>Восход:</strong> {{ day.sunrise }} | <strong>Закат:</strong> {{ day.sunset }}</p>
+    {% with day=weather_data.days.0 %}
+    <div class="max-w-4xl mx-auto bg-gray-900 rounded-xl shadow-md p-6 mb-10">
+        <h2 class="text-2xl font-semibold text-white mb-2">{{ weather_data.resolvedAddress }}</h2>
+        <p class="italic text-gray-400 mb-4">{{ weather_data.description }}</p>
+        <div class="grid md:grid-cols-2 gap-4 text-gray-200">
+            <h1 class="text-6xl font-bold text-white mb-2">{{ day.temp|round }}°C </h1>
+            <br>
+            <p><strong>🌡Минимум:</strong> {{ day.tempmin|round }}°C | <strong>🌡Максимум:</strong> {{ day.tempmax|round }}°C</p>
+            <p><strong>🥵 Ощущается как:</strong> {{ day.feelslike|round }}°C</p>
+            <p><strong>💧 Влажность:</strong> {{ day.humidity|round }}%</p>
+            <p><strong>🌥 Условия:</strong> {{ day.conditions }}</p>
+            <p><strong>💨 Ветер:</strong> {{ day.windspeed|round }} км/ч, порывы до {{ day.windgust|round }} км/ч</p>
+            <p><strong>🌅 Восход:</strong> {{ day.sunrise }} | <strong>🌇 Закат:</strong> {{ day.sunset }}</p>
         </div>
+    </div>
 
-        <h3>Почасовая погода</h3>
-        <table class="hourly-table">
-            <thead>
-                <tr>
-                    <th>Время</th>
-                    <th>Температура (°C)</th>
-                    <th>Ощущается как (°C)</th>
-                    <th>Влажность (%)</th>
-                    <th>Осадки (мм)</th>
-                    <th>Облачность (%)</th>
-                    <th>УФ индекс</th>
-                    <th>Условия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for hour in day.hours %}
-                    <tr>
-                        <td>{{ hour.datetime }}</td>
-                        <td>{{ hour.temp }}</td>
-                        <td>{{ hour.feelslike }}</td>
-                        <td>{{ hour.humidity }}</td>
-                        <td>{{ hour.precip }}</td>
-                        <td>{{ hour.cloudcover }}</td>
-                        <td>{{ hour.uvindex }}</td>
-                        <td>{{ hour.conditions }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endwith %}
-    {% endif %}
+    <h3 class="text-xl font-bold text-center text-white mb-4">Почасовая погода</h3>
+    <div class="px-4">
+        <div class="grid grid-cols-6 gap-4">
+            {% for hour in day.hours|slice:":24" %}
+            <div class="bg-gray-800 text-white rounded-xl p-4 shadow text-sm">
+                <p class="text-lg font-semibold mb-2 text-center">{{ hour.datetime|short_time }}</p>
+                <p>🌡 {{ hour.temp|round }}°C</p>
+                <p>🥵 {{ hour.feelslike|round }}°C</p>
+                <p>💧 {{ hour.humidity|round }}%</p>
+                <p>🌧 {{ hour.precip }} мм</p>
+                <p>☁️ {{ hour.cloudcover|round }}%</p>
+                <p>☀️ УФ: {{ hour.uvindex|round }}</p>
+                <p>📋 {{ hour.conditions }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% endwith %}
+{% endif %}
 {% endblock %}

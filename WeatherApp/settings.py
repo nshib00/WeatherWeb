@@ -155,3 +155,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGIN_REDIRECT_URL = "/"
 
 LOGIN_URL = "/accounts/login/"
+
+ACCOUNT_FORMS = {
+    'login': 'users.forms.CustomLoginForm',
+    'signup': 'users.forms.CustomSignupForm',
+}

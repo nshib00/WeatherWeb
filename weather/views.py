@@ -28,3 +28,8 @@ def home(request: HttpRequest) -> HttpResponse:
         'title': 'Погода на сегодня'
     }
     return render(request, 'weather/home.html', context)
+
+
+@login_required
+def favorite_cities(request: HttpRequest) -> HttpResponse:
+    return render(request, 'weather/favorite.html')

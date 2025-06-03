@@ -1,10 +1,12 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from weather.forms import CityForm
 from .services.weather_api import WeatherAPIService
 
 
+@login_required
 def home(request: HttpRequest) -> HttpResponse:
     weather_data = None
     error = None

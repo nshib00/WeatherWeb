@@ -8,8 +8,34 @@
         <link rel="stylesheet" href="{% static 'css/output.css' %}" type="text/css">
         <title>{{ title }}</title>
     </head>
+    <script>
+        setTimeout(() => {
+            const messagesContainer = document.querySelector('.flash-messages');
+            if (messagesContainer) {
+                messagesContainer.style.opacity = '0';
+                setTimeout(() => {
+                    messagesContainer.style.display = 'none';
+                }, 1000);
+            }
+        }, 3000);
+    </script>
     <body>
         {% include "navbar.html" %}
+
+        {% if messages %}
+            <div class="flash-messages fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md transition-opacity duration-1000">
+                {% for message in messages %}
+                <div class="mb-2 px-4 py-3 rounded-lg text-center text-white
+                    {% if message.tags == 'success' %}bg-green-600
+                    {% elif message.tags == 'error' %}bg-red-600
+                    {% elif message.tags == 'warning' %}bg-yellow-600
+                    {% else %}bg-gray-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <main class="pt-16"> 
             {% block content %}{% endblock %}
         </main>

@@ -1,15 +1,22 @@
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from requests import JSONDecodeError
 
 from weather.forms import CityForm
+from weather.models import City
 from .services.weather_api import WeatherAPIService
 
 
 @login_required
 def home(request: HttpRequest) -> HttpResponse:
+    initial_city = request.session.pop('last_city', None)
     weather_data = None
     error = None
+
+    if initial_city:
+        weather_data = WeatherAPIService.get_today_weather(initial_city)
 
     if request.method == 'POST':
         form = CityForm(request.POST)
@@ -33,3 +40,27 @@ def home(request: HttpRequest) -> HttpResponse:
 @login_required
 def favorite_cities(request: HttpRequest) -> HttpResponse:
     return render(request, 'weather/favorite.html')
+
+
+@login_required
+def add_favorite_city(request: HttpRequest) -> HttpResponse:
+    if request.method == 'POST':
+        full_city_name = request.POST.get('city')
+
+        if full_city_name:
+            try:
+                city, region = [part.strip() for part in full_city_name.split(',', 1)]
+
+                if not City.objects.filter(user=request.user, name=city).exists():
+                    City.objects.create(user=request.user, name=city, region=region, is_default=False)
+                    messages.success(request, f"Город {city} добавлен в избранные.")
+                else:
+                    messages.warning(request, f"Город {city} уже в избранных.")                
+            except (ValueError, JSONDecodeError):
+                messages.error(request, "Невозможно определить город и регион. Проверьте, правильно ли написано название города.")
+        else:
+            messages.error(request, "Название города не передано.")
+
+        request.session['last_city'] = full_city_name
+
+    return redirect('home')

@@ -27,7 +27,7 @@
     <div class="max-w-5xl mx-auto bg-gray-900 rounded-xl shadow-md p-6 mb-10">
         <div class="flex justify-between items-center mb-2">
             <h2 class="text-2xl font-semibold text-white">{{ weather_data.resolvedAddress }}</h2>
-            <form method="post" action="">
+            <form method="post" action="{% url 'add_favorite_city' %}" class="ml-auto">
                 {% csrf_token %}
                 <input type="hidden" name="city" value="{{ weather_data.resolvedAddress }}">
                 <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">

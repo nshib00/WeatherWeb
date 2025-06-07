@@ -69,7 +69,19 @@ def add_favorite_city(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def set_default_city(request: HttpRequest, id: int) -> HttpResponse:
-    city = get_object_or_404(City, id=id, user=request.user)
+    try:
+        city = get_object_or_404(City, id=id, user=request.user)
+        if city.is_default:
+            messages.warning(request, f"Город {city} уже установлен как город по умолчанию.") 
+        else:
+            City.objects.filter(user=request.user, is_default=True).update(is_default=False)
+            City.objects.filter(id=city.id).update(is_default=True)
+            messages.success(request, f"Город {city} успешно установлен как город по умолчанию.") 
+    except Exception as e:
+        messages.error(request, "Возникла ошибка: невозможно установить данный город как город по умолчанию.")
+        print(e.__class__.__name__, e)
+    return redirect('favorites')
+    
 
 
 @login_required

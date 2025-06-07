@@ -21,7 +21,9 @@
                             </button>
                         </form>
                         {% else %}
-                            <span class="text-green-400 text-sm font-semibold">По умолчанию</span>
+                            <div class="text-green-400 text-sm font-semibold mb-2 px-3 py-1">
+                                Город по умолчанию
+                            </div>
                         {% endif %}
                         <form method="post" action="{% url 'delete_favorite_city' city.id %}">
                             {% csrf_token %}

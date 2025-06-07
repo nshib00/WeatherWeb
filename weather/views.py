@@ -39,7 +39,8 @@ def home(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def favorite_cities(request: HttpRequest) -> HttpResponse:
-    return render(request, 'weather/favorite.html')
+    cities = City.objects.filter(user=request.user).order_by('-is_default', 'name')
+    return render(request, 'weather/favorite.html', context={'cities': cities})
 
 
 @login_required
@@ -64,3 +65,13 @@ def add_favorite_city(request: HttpRequest) -> HttpResponse:
         request.session['last_city'] = full_city_name
 
     return redirect('home')
+
+
+@login_required
+def set_default_city(request: HttpRequest) -> HttpResponse:
+    pass
+
+
+@login_required
+def delete_favorite_city(request: HttpRequest, id: int) -> HttpResponse:
+    pass

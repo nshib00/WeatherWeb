@@ -1,3 +1,40 @@
+{% extends 'base.html' %}
+
 {% block content %}
-Избранные города
+<body class="bg-[#252525] min-h-screen py-10 px-4">
+    <h1 class="text-3xl font-bold text-center text-white mb-8">Избранные города</h1>
+
+    <div class="max-w-5xl mx-auto bg-gray-800 rounded-xl shadow-lg p-6 space-y-4">
+        {% if cities %}
+            {% for city in cities %}
+                <div class="bg-gray-900 rounded-lg p-4 shadow-md flex justify-between items-center">
+                    <div>
+                        <p class="text-2xl font-bold text-white">{{ city.name }}</p>
+                        <p class="text-gray-400 italic text-sm">{{ city.region }}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        {% if not city.is_default %}
+                        <form method="post" action="{% url 'set_default_city' city.id %}">
+                            {% csrf_token %}
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-3 py-1 rounded-lg transition">
+                                Сделать городом по умолчанию
+                            </button>
+                        </form>
+                        {% else %}
+                            <span class="text-green-400 text-sm font-semibold">По умолчанию</span>
+                        {% endif %}
+                        <form method="post" action="{% url 'delete_favorite_city' city.id %}">
+                            {% csrf_token %}
+                            <button class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-3 py-1 rounded-lg transition">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center text-gray-300">У вас пока нет избранных городов.</p>
+        {% endif %}
+    </div>
+</body>
 {% endblock %}

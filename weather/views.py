@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from requests import JSONDecodeError
@@ -68,10 +68,16 @@ def add_favorite_city(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
-def set_default_city(request: HttpRequest) -> HttpResponse:
-    pass
+def set_default_city(request: HttpRequest, id: int) -> HttpResponse:
+    city = get_object_or_404(City, id=id, user=request.user)
 
 
 @login_required
 def delete_favorite_city(request: HttpRequest, id: int) -> HttpResponse:
-    pass
+    city = get_object_or_404(City, id=id, user=request.user)
+    try:
+        city.delete()
+        messages.success(request, f"Город {city} успешно удален из избранных.")
+    except Exception:
+        messages.error(request, "Ошибка: невозможно удалить город.")
+    return redirect('favorites')

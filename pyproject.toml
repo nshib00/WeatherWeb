@@ -12,6 +12,8 @@ django = "^5.2.1"
 python-dotenv = "^1.1.0"
 pillow = "^11.2.1"
 django-allauth = "^65.9.0"
+pyjwt = "^2.10.1"
+cryptography = "^45.0.3"
 
 
 [build-system]

@@ -33,7 +33,7 @@
             </button>
         </form>
 
-        {% if SOCIALACCOUNT_ENABLED %}
+        {% if socialaccount_providers %}
             <div class="mt-6 border-t border-gray-700 pt-4">
                 {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
             </div>
